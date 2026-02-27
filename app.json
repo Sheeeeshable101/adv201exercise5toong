@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "Movie Vault",
+    "slug": "movie-vault",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/movie vault.png",
+    "scheme": "movievault",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#141414",
+        "foregroundImage": "./assets/images/movie vault.png",
+        "backgroundImage": "./assets/images/movie vault.png",
+        "monochromeImage": "./assets/images/movie vault.png"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/movie vault.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/movie vault.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#141414",
+          "dark": {
+            "backgroundColor": "#141414"
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}
