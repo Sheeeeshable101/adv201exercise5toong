@@ -63,7 +63,6 @@ export default function AccountScreen() {
     router.replace("/");
   };
 
-  // Get user initials for avatar fallback
   const getUserInitials = () => {
     if (firstName && lastName) {
       return `${firstName[0]}${lastName[0]}`.toUpperCase();
@@ -85,7 +84,6 @@ export default function AccountScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Profile Photo */}
         <View style={styles.photoSection}>
           <TouchableOpacity style={styles.photoContainer} onPress={pickImage}>
             {profilePhoto ? (
@@ -105,7 +103,6 @@ export default function AccountScreen() {
           <Text style={styles.photoHint}>Tap to change photo</Text>
         </View>
 
-        {/* Account Info */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account Information</Text>
 
@@ -139,7 +136,6 @@ export default function AccountScreen() {
           </View>
         </View>
 
-        {/* Save Button */}
         <TouchableOpacity
           style={styles.saveButton}
           onPress={handleSave}
@@ -152,7 +148,6 @@ export default function AccountScreen() {
           )}
         </TouchableOpacity>
 
-        {/* Logout Button */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutButtonText}>Logout</Text>
         </TouchableOpacity>

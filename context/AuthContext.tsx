@@ -106,7 +106,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       users.push(newUser);
       await AsyncStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
 
-      // Auto login after registration (without password)
       const { password: _, ...userWithoutPassword } = newUser;
       setUser(userWithoutPassword);
       await AsyncStorage.setItem(
@@ -143,7 +142,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         JSON.stringify(updatedUser),
       );
 
-      // Update in users list
       const usersData = await AsyncStorage.getItem(STORAGE_KEYS.USERS);
       if (usersData) {
         const users: User[] = JSON.parse(usersData);

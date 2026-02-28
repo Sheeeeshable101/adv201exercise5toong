@@ -22,7 +22,6 @@ const MOVIE_CARD_HEIGHT = MOVIE_CARD_WIDTH * 1.5;
 
 const { width } = Dimensions.get("window");
 
-// Parallax Movie Card Component
 function ParallaxMovieCard({
   movie,
   onPress,
@@ -71,7 +70,6 @@ function ParallaxMovieCard({
   );
 }
 
-// Featured Movie Banner with Parallax
 function FeaturedBanner({
   movie,
   onPress,
@@ -153,7 +151,6 @@ export default function HomeScreen() {
   const movies = require("@/data/movies").movies;
   const featuredMovie = require("@/data/movies").featuredMovie;
 
-  // Get user initials for avatar fallback
   const getUserInitials = () => {
     if (user?.firstName && user?.lastName) {
       return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
@@ -163,7 +160,6 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#141414" }}>
-      {/* Header */}
       <View style={styles.header}>
         <View style={styles.logoContainer}>
           <Text style={styles.logoText}>Movie</Text>
@@ -191,7 +187,6 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* User Welcome */}
       {user && (
         <View style={styles.welcomeContainer}>
           <Text style={styles.welcomeText}>
@@ -206,13 +201,11 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         bounces={true}
       >
-        {/* Featured Banner */}
         <FeaturedBanner
           movie={featuredMovie}
           onPress={() => showMovieDetails(featuredMovie)}
         />
 
-        {/* Continue Watching */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Continue Watching</Text>
           <ScrollView
@@ -230,7 +223,6 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* Trending Now */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>🔥 Trending Now</Text>
           <ScrollView
@@ -248,7 +240,6 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* New Releases */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>✨ New Releases</Text>
           <ScrollView
@@ -269,7 +260,6 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* All Movies */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>🎬 All Movies</Text>
           <View style={styles.gridContainer}>

@@ -19,7 +19,6 @@ export default function LandingScreen() {
   const [loadingAnim] = useState(new Animated.Value(0));
 
   useEffect(() => {
-    // Start the loading animation
     Animated.loop(
       Animated.timing(loadingAnim, {
         toValue: 1,
@@ -46,7 +45,6 @@ export default function LandingScreen() {
     }
   }, [user, isLoading]);
 
-  // Create rotation animation
   const spin = loadingAnim.interpolate({
     inputRange: [0, 1],
     outputRange: ["0deg", "360deg"],
@@ -71,7 +69,6 @@ export default function LandingScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Background gradient effect */}
       <View style={styles.backgroundGradient}>
         <View style={styles.logoSection}>
           <Text style={styles.logoText}>Movie</Text>
@@ -85,7 +82,6 @@ export default function LandingScreen() {
         <Text style={styles.subtitle}>Watch anywhere. Cancel anytime.</Text>
       </View>
 
-      {/* Buttons */}
       <View style={styles.buttonSection}>
         <TouchableOpacity
           style={styles.signInButton}
@@ -106,7 +102,6 @@ export default function LandingScreen() {
         </Text>
       </View>
 
-      {/* Features */}
       <View style={styles.features}>
         <View style={styles.featureItem}>
           <Text style={styles.featureIcon}>📺</Text>
