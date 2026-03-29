@@ -1,4 +1,7 @@
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/context/AuthContext";
+import { useThemeColor } from "@/hooks/use-theme-color";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -8,7 +11,6 @@ import {
   Alert,
   Image,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -21,7 +23,7 @@ interface SetupFormData {
 
 export default function SetupAccountScreen() {
   const router = useRouter();
-  const { setupAccount, user } = useAuth();
+  const { setupAccount } = useAuth();
   const [profilePhoto, setProfilePhoto] = useState<string | undefined>(
     undefined,
   );
@@ -47,7 +49,7 @@ export default function SetupAccountScreen() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.5,
@@ -59,12 +61,12 @@ export default function SetupAccountScreen() {
   };
 
   const onSubmit = async (data: SetupFormData) => {
-    const filteredFirstName = data.firstName.trim();
-    const filteredLastName = data.lastName.trim();
+    const firstName = data.firstName;
+    const lastName = data.lastName;
 
     setIsSubmitting(true);
     try {
-      await setupAccount(filteredFirstName, filteredLastName, profilePhoto);
+      await setupAccount(firstName, lastName, profilePhoto);
       router.replace("/(tabs)");
     } catch (error) {
       Alert.alert("Error", "Failed to set up account. Please try again.");
@@ -74,14 +76,16 @@ export default function SetupAccountScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>Movie</Text>
-          <Text style={styles.logoAccent}>Vault</Text>
+          <ThemedText style={styles.logoText}>Movie</ThemedText>
+          <ThemedText style={styles.logoAccent}>Vault</ThemedText>
         </View>
-        <Text style={styles.title}>Set Up Your Profile</Text>
-        <Text style={styles.subtitle}>Add your personal information</Text>
+        <ThemedText style={styles.title}>Set Up Your Profile</ThemedText>
+        <ThemedText style={styles.subtitle}>
+          Add your personal information
+        </ThemedText>
       </View>
 
       <View style={styles.form}>
@@ -90,54 +94,79 @@ export default function SetupAccountScreen() {
             <Image source={{ uri: profilePhoto }} style={styles.profilePhoto} />
           ) : (
             <View style={styles.photoPlaceholder}>
-              <Text style={styles.photoIcon}>📷</Text>
+              <ThemedText style={styles.photoIcon}>📷</ThemedText>
             </View>
           )}
           <View style={styles.editBadge}>
-            <Text style={styles.editIcon}>✏️</Text>
+            <ThemedText style={styles.editIcon}>✏️</ThemedText>
           </View>
         </TouchableOpacity>
-        <Text style={styles.photoHint}>Tap to add photo</Text>
+        <ThemedText style={styles.photoHint}>Tap to add photo</ThemedText>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>First Name</Text>
+          <ThemedText style={styles.label}>First Name</ThemedText>
           <TextInput
-            style={[styles.input, errors.firstName && styles.inputError]}
+            style={[
+              styles.input,
+              {
+                backgroundColor: useThemeColor({}, "card"),
+                borderColor: useThemeColor({}, "border"),
+                color: useThemeColor({}, "text"),
+              },
+              errors.firstName && styles.inputError,
+            ]}
             placeholder="Enter your first name"
-            placeholderTextColor="#666"
+            placeholderTextColor={useThemeColor({}, "placeholder")}
             {...register("firstName", {
               required: "First name is required",
             })}
           />
           {errors.firstName ? (
-            <Text style={styles.errorText}>{errors.firstName.message}</Text>
+            <ThemedText style={styles.errorText}>
+              {errors.firstName.message}
+            </ThemedText>
           ) : null}
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Last Name</Text>
+          <ThemedText style={styles.label}>Last Name</ThemedText>
           <TextInput
-            style={[styles.input, errors.lastName && styles.inputError]}
+            style={[
+              styles.input,
+              {
+                backgroundColor: useThemeColor({}, "card"),
+                borderColor: useThemeColor({}, "border"),
+                color: useThemeColor({}, "text"),
+              },
+              errors.lastName && styles.inputError,
+            ]}
             placeholder="Enter your last name"
-            placeholderTextColor="#666"
+            placeholderTextColor={useThemeColor({}, "placeholder")}
             {...register("lastName", {
               required: "Last name is required",
             })}
           />
           {errors.lastName ? (
-            <Text style={styles.errorText}>{errors.lastName.message}</Text>
+            <ThemedText style={styles.errorText}>
+              {errors.lastName.message}
+            </ThemedText>
           ) : null}
         </View>
 
         <TouchableOpacity
-          style={styles.button}
+          style={[
+            styles.button,
+            {
+              backgroundColor: useThemeColor({}, "primary"),
+            },
+          ]}
           onPress={handleSubmit(onSubmit)}
           disabled={isSubmitting}
         >
           {isSubmitting ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.buttonText}>Complete Setup</Text>
+            <ThemedText style={styles.buttonText}>Complete Setup</ThemedText>
           )}
         </TouchableOpacity>
 
@@ -145,10 +174,10 @@ export default function SetupAccountScreen() {
           style={styles.skipButton}
           onPress={() => router.replace("/(tabs)")}
         >
-          <Text style={styles.skipButtonText}>Skip for now</Text>
+          <ThemedText style={styles.skipButtonText}>Skip for now</ThemedText>
         </TouchableOpacity>
       </View>
-    </View>
+    </ThemedView>
   );
 }
 
@@ -159,7 +188,6 @@ SetupAccountScreen.options = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#141414",
     padding: 24,
   },
   header: {
@@ -175,22 +203,18 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#E50914",
   },
   logoAccent: {
     fontSize: 28,
     fontWeight: "300",
-    color: "#fff",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#fff",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    color: "#666",
   },
   form: {
     flex: 1,
@@ -211,7 +235,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: "#333",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,
@@ -225,7 +248,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: "#E50914",
     width: 32,
     height: 32,
     borderRadius: 16,
@@ -236,7 +258,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   photoHint: {
-    color: "#666",
     fontSize: 12,
     textAlign: "center",
     marginBottom: 24,
@@ -247,7 +268,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#fff",
     marginBottom: 8,
   },
   input: {
@@ -255,16 +275,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: "#333",
-    color: "#fff",
     borderWidth: 1,
-    borderColor: "#444",
   },
   inputError: {
     borderColor: "#ff4444",
   },
   errorText: {
-    color: "#ff4444",
     fontSize: 12,
     marginTop: 4,
   },
@@ -274,10 +290,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 10,
-    backgroundColor: "#E50914",
   },
   buttonText: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -286,7 +300,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   skipButtonText: {
-    color: "#666",
     fontSize: 14,
   },
 });

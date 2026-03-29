@@ -1,45 +1,39 @@
-import { Platform } from "react-native";
-
-const tintColorLight = "#0a7ea4";
-const tintColorDark = "#fff";
-
 export const Colors = {
   light: {
-    text: "#11181C",
-    background: "#fff",
-    tint: tintColorLight,
-    icon: "#687076",
-    tabIconDefault: "#687076",
-    tabIconSelected: tintColorLight,
+    background: "#ffffff",
+    text: "#000000",
+    primary: "#007AFF",
+    card: "#f8f9fa",
+    border: "#e9ecef",
+    inputBg: "#ffffff",
+    inputText: "#000000",
+    inputBorder: "#e9ecef",
+    placeholder: "#999999",
+    errorBg: "rgba(255, 199, 199, 0.2)",
   },
   dark: {
-    text: "#ECEDEE",
-    background: "#151718",
-    tint: tintColorDark,
-    icon: "#9BA1A6",
-    tabIconDefault: "#9BA1A6",
-    tabIconSelected: tintColorDark,
+    background: "#000000",
+    text: "#ffffff",
+    primary: "#0A84FF",
+    card: "#1a1a1a",
+    border: "#333333",
+    inputBg: "#1f1f1f",
+    inputText: "#ffffff",
+    inputBorder: "#444444",
+    placeholder: "#888888",
+    errorBg: "rgba(255, 99, 99, 0.15)",
   },
-};
-
-export const Fonts = Platform.select({
-  ios: {
-    sans: "system-ui",
-    serif: "ui-serif",
-    rounded: "ui-rounded",
-    mono: "ui-monospace",
+  movieVault: {
+    background: "#1a0d2e",
+    text: "#e0e0e0",
+    primary: "#bb86fc",
+    accent: "#00d4ff",
+    card: "#2a1a4a",
+    border: "#4a2a7a",
+    inputBg: "#2a1a4a",
+    inputText: "#e0e0e0",
+    inputBorder: "#4a2a7a",
+    placeholder: "#bb86fc",
+    errorBg: "rgba(255, 99, 99, 0.2)",
   },
-  default: {
-    sans: "normal",
-    serif: "serif",
-    rounded: "normal",
-    mono: "monospace",
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded:
-      "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+} as const;

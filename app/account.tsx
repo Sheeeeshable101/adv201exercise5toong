@@ -1,4 +1,8 @@
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/context/AuthContext";
+import { useColorScheme as useHookColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColor } from "@/hooks/use-theme-color";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -8,7 +12,6 @@ import {
   Image,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -23,6 +26,19 @@ export default function AccountScreen() {
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const theme = useHookColorScheme();
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const iconColor = useThemeColor({}, "icon");
+  const tintColor = useThemeColor({}, "tint");
+  const inputBgColor = useThemeColor(
+    { light: "#f8f9fa", dark: "#333333" },
+    "card",
+  );
+  const inputBorderColor = useThemeColor({ light: "#E0E0E0", dark: "#444444" });
+  const buttonBgColor = tintColor;
+  const buttonTextColor = useThemeColor({ light: "#FFFFFF", dark: "#FFFFFF" });
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -71,15 +87,15 @@ export default function AccountScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <ThemedView style={styles.container}>
+      <View style={[styles.header, { backgroundColor }]}>
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
         >
-          <Text style={styles.backText}>← Back</Text>
+          <ThemedText style={styles.backText}>← Back</ThemedText>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Account Details</Text>
+        <ThemedText style={styles.headerTitle}>Account Details</ThemedText>
         <View style={{ width: 60 }} />
       </View>
 
@@ -92,44 +108,73 @@ export default function AccountScreen() {
                 style={styles.profilePhoto}
               />
             ) : (
-              <View style={styles.photoPlaceholder}>
-                <Text style={styles.photoInitials}>{getUserInitials()}</Text>
+              <View
+                style={[
+                  styles.photoPlaceholder,
+                  { backgroundColor: inputBgColor },
+                ]}
+              >
+                <ThemedText style={styles.photoInitials}>
+                  {getUserInitials()}
+                </ThemedText>
               </View>
             )}
-            <View style={styles.editBadge}>
-              <Text style={styles.editIcon}>📷</Text>
+            <View
+              style={[styles.editBadge, { backgroundColor: buttonBgColor }]}
+            >
+              <ThemedText style={styles.editIcon}>📷</ThemedText>
             </View>
           </TouchableOpacity>
-          <Text style={styles.photoHint}>Tap to change photo</Text>
+          <ThemedText style={styles.photoHint}>Tap to change photo</ThemedText>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account Information</Text>
+          <ThemedText style={styles.sectionTitle}>
+            Account Information
+          </ThemedText>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <View style={styles.emailContainer}>
-              <Text style={styles.emailText}>{user?.email || "Not set"}</Text>
+            <ThemedText style={styles.label}>Email</ThemedText>
+            <View
+              style={[styles.emailContainer, { backgroundColor: inputBgColor }]}
+            >
+              <ThemedText style={styles.emailText}>
+                {user?.email || "Not set"}
+              </ThemedText>
             </View>
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>First Name</Text>
+            <ThemedText style={styles.label}>First Name</ThemedText>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: inputBgColor,
+                  borderColor: inputBorderColor,
+                  color: textColor,
+                },
+              ]}
               placeholder="Enter your first name"
-              placeholderTextColor="#666"
+              placeholderTextColor={iconColor}
               value={firstName}
               onChangeText={setFirstName}
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Last Name</Text>
+            <ThemedText style={styles.label}>Last Name</ThemedText>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: inputBgColor,
+                  borderColor: inputBorderColor,
+                  color: textColor,
+                },
+              ]}
               placeholder="Enter your last name"
-              placeholderTextColor="#666"
+              placeholderTextColor={iconColor}
               value={lastName}
               onChangeText={setLastName}
             />
@@ -137,24 +182,35 @@ export default function AccountScreen() {
         </View>
 
         <TouchableOpacity
-          style={styles.saveButton}
+          style={[styles.saveButton, { backgroundColor: buttonBgColor }]}
           onPress={handleSave}
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={buttonTextColor} />
           ) : (
-            <Text style={styles.saveButtonText}>Save Changes</Text>
+            <ThemedText
+              style={[styles.saveButtonText, { color: buttonTextColor }]}
+            >
+              Save Changes
+            </ThemedText>
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
+        <TouchableOpacity
+          style={[styles.logoutButton, { borderColor: buttonBgColor }]}
+          onPress={handleLogout}
+        >
+          <ThemedText
+            style={[styles.logoutButtonText, { color: buttonBgColor }]}
+          >
+            Logout
+          </ThemedText>
         </TouchableOpacity>
 
         <View style={{ height: 50 }} />
       </ScrollView>
-    </View>
+    </ThemedView>
   );
 }
 
@@ -165,7 +221,6 @@ AccountScreen.options = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#141414",
   },
   header: {
     flexDirection: "row",
@@ -174,17 +229,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 50,
     paddingBottom: 16,
-    backgroundColor: "#141414",
   },
   backButton: {
     padding: 8,
   },
   backText: {
-    color: "#E50914",
     fontSize: 16,
   },
   headerTitle: {
-    color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
@@ -204,13 +256,12 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 3,
-    borderColor: "#E50914",
+    borderColor: "#E50914", // Keep accent as tint
   },
   photoPlaceholder: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "#333",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 3,
@@ -219,13 +270,11 @@ const styles = StyleSheet.create({
   photoInitials: {
     fontSize: 40,
     fontWeight: "bold",
-    color: "#fff",
   },
   editBadge: {
     position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: "#E50914",
     width: 36,
     height: 36,
     borderRadius: 18,
@@ -236,7 +285,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   photoHint: {
-    color: "#666",
     fontSize: 12,
     marginTop: 8,
   },
@@ -244,7 +292,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 16,
@@ -253,7 +300,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    color: "#999",
     fontSize: 14,
     marginBottom: 8,
   },
@@ -262,20 +308,16 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: "#333",
-    color: "#fff",
     borderWidth: 1,
-    borderColor: "#444",
   },
   emailContainer: {
     height: 50,
     borderRadius: 4,
     paddingHorizontal: 16,
     justifyContent: "center",
-    backgroundColor: "#2a2a2a",
+    borderWidth: 1,
   },
   emailText: {
-    color: "#999",
     fontSize: 16,
   },
   saveButton: {
@@ -283,11 +325,9 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#E50914",
     marginBottom: 16,
   },
   saveButtonText: {
-    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -296,12 +336,9 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: "#E50914",
   },
   logoutButtonText: {
-    color: "#E50914",
     fontSize: 16,
     fontWeight: "bold",
   },

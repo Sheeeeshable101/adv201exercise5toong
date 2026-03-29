@@ -1,4 +1,7 @@
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -6,7 +9,6 @@ import {
   Dimensions,
   Easing,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -14,9 +16,20 @@ import {
 const { width } = Dimensions.get("window");
 
 export default function LandingScreen() {
+  const [state, dispatch] = useTheme();
+  const theme = state.theme;
   const router = useRouter();
   const { user, isLoading } = useAuth();
   const [loadingAnim] = useState(new Animated.Value(0));
+
+  const toggleTheme = () => dispatch({ type: "TOGGLE_THEME" });
+
+  const themeText =
+    theme === "light"
+      ? "☀️ Light"
+      : theme === "dark"
+        ? "🌙 Dark"
+        : "🎬 MovieVault";
 
   useEffect(() => {
     Animated.loop(
@@ -43,7 +56,7 @@ export default function LandingScreen() {
         }
       }
     }
-  }, [user, isLoading]);
+  }, [user, isLoading, router]);
 
   const spin = loadingAnim.interpolate({
     inputRange: [0, 1],
@@ -52,82 +65,108 @@ export default function LandingScreen() {
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
+      <ThemedView style={styles.loadingContainer}>
         <View style={styles.loadingLogo}>
-          <Text style={styles.loadingLogoText}>Movie</Text>
-          <Text style={styles.loadingLogoAccent}>Vault</Text>
+          <ThemedText style={styles.loadingLogoText}>Movie</ThemedText>
+          <ThemedText style={styles.loadingLogoAccent}>Vault</ThemedText>
         </View>
         <Animated.View
           style={[styles.loadingSpinner, { transform: [{ rotate: spin }] }]}
         >
           <View style={styles.spinnerInner} />
         </Animated.View>
-        <Text style={styles.loadingText}>Loading your experience...</Text>
-      </View>
+        <ThemedText style={styles.loadingText}>
+          Loading your experience...
+        </ThemedText>
+      </ThemedView>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.backgroundGradient}>
+    <ThemedView style={styles.container}>
+      <TouchableOpacity style={styles.themeToggle} onPress={toggleTheme}>
+        <ThemedText style={styles.themeToggleText}>{themeText}</ThemedText>
+      </TouchableOpacity>
+      <ThemedView style={styles.backgroundGradient}>
         <View style={styles.logoSection}>
-          <Text style={styles.logoText}>Movie</Text>
-          <Text style={styles.logoAccent}>Vault</Text>
+          <ThemedText style={styles.logoText}>Movie</ThemedText>
+          <ThemedText style={styles.logoAccent}>Vault</ThemedText>
         </View>
 
-        <Text style={styles.tagline}>
+        <ThemedText style={styles.tagline}>
           Unlimited movies, TV shows, and more.
-        </Text>
+        </ThemedText>
 
-        <Text style={styles.subtitle}>Watch anywhere. Cancel anytime.</Text>
-      </View>
+        <ThemedText style={styles.subtitle}>
+          Watch anywhere. Cancel anytime.
+        </ThemedText>
+      </ThemedView>
 
       <View style={styles.buttonSection}>
         <TouchableOpacity
           style={styles.signInButton}
           onPress={() => router.push("/login")}
         >
-          <Text style={styles.signInButtonText}>Sign In</Text>
+          <ThemedText style={styles.signInButtonText}>Sign In</ThemedText>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.signUpButton}
           onPress={() => router.push("/register")}
         >
-          <Text style={styles.signUpButtonText}>Create Account</Text>
+          <ThemedText style={styles.signUpButtonText}>
+            Create Account
+          </ThemedText>
         </TouchableOpacity>
 
-        <Text style={styles.terms}>
+        <ThemedText style={styles.terms}>
           By continuing, you agree to our Terms of Service and Privacy Policy.
-        </Text>
+        </ThemedText>
       </View>
 
       <View style={styles.features}>
         <View style={styles.featureItem}>
-          <Text style={styles.featureIcon}>📺</Text>
-          <Text style={styles.featureText}>Watch on any device</Text>
+          <ThemedText style={styles.featureIcon}>📺</ThemedText>
+          <ThemedText style={styles.featureText}>
+            Watch on any device
+          </ThemedText>
         </View>
         <View style={styles.featureItem}>
-          <Text style={styles.featureIcon}>⬇️</Text>
-          <Text style={styles.featureText}>Download & go</Text>
+          <ThemedText style={styles.featureIcon}>⬇️</ThemedText>
+          <ThemedText style={styles.featureText}>Download & go</ThemedText>
         </View>
         <View style={styles.featureItem}>
-          <Text style={styles.featureIcon}>✨</Text>
-          <Text style={styles.featureText}>New releases weekly</Text>
+          <ThemedText style={styles.featureIcon}>✨</ThemedText>
+          <ThemedText style={styles.featureText}>
+            New releases weekly
+          </ThemedText>
         </View>
       </View>
-    </View>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#141414",
+  },
+  themeToggle: {
+    position: "absolute",
+    top: 60,
+    right: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    zIndex: 1,
+    backgroundColor: "rgba(255,255,255,0.2)",
+  },
+  themeToggleText: {
+    textAlign: "center",
+    fontSize: 12,
+    fontWeight: "600",
   },
   backgroundGradient: {
     flex: 1,
-    backgroundColor: "#141414",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 32,
@@ -140,23 +179,22 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 48,
     fontWeight: "bold",
-    color: "#E50914",
+    lineHeight: 48,
   },
   logoAccent: {
     fontSize: 48,
     fontWeight: "300",
-    color: "#fff",
+    lineHeight: 48,
+    marginLeft: 4,
   },
   tagline: {
     fontSize: 20,
-    color: "#fff",
     textAlign: "center",
     marginBottom: 8,
     fontWeight: "600",
   },
   subtitle: {
     fontSize: 14,
-    color: "#999",
     textAlign: "center",
     marginBottom: 40,
   },
@@ -172,7 +210,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   signInButtonText: {
-    color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
@@ -183,12 +220,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   signUpButtonText: {
-    color: "#fff",
     fontSize: 18,
     fontWeight: "600",
   },
   terms: {
-    color: "#666",
     fontSize: 11,
     textAlign: "center",
     marginTop: 16,
@@ -207,16 +242,11 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   featureText: {
-    color: "#666",
     fontSize: 10,
-  },
-  loadingText: {
-    color: "#fff",
-    fontSize: 18,
+    textAlign: "center",
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: "#141414",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -228,19 +258,24 @@ const styles = StyleSheet.create({
   loadingLogoText: {
     fontSize: 36,
     fontWeight: "bold",
-    color: "#E50914",
+    lineHeight: 36,
   },
   loadingLogoAccent: {
     fontSize: 36,
     fontWeight: "300",
-    color: "#fff",
+    lineHeight: 36,
+    marginLeft: 4,
+  },
+  loadingText: {
+    fontSize: 18,
+    textAlign: "center",
   },
   loadingSpinner: {
     width: 50,
     height: 50,
     borderRadius: 25,
     borderWidth: 4,
-    borderColor: "#333",
+    borderColor: "rgba(255,255,255,0.3)",
     borderTopColor: "#E50914",
     justifyContent: "center",
     alignItems: "center",
@@ -251,7 +286,7 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
     borderWidth: 3,
-    borderColor: "#444",
+    borderColor: "rgba(255,255,255,0.2)",
     borderTopColor: "#E50914",
   },
 });

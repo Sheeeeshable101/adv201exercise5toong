@@ -1,22 +1,16 @@
-# Login and Registration Flow - TODO List
+# TODO: Remove Theme Switching (to fixed movieVault theme) - COMPLETE
 
-## Dependencies
+Original packages updated + theme switching removed.
 
-- [x] Install react-hook-form
-- [x] Install @react-native-async-storage/async-storage
-- [x] Install expo-image-picker
+1. ✅ Packages: async-storage 2.2.0, image-picker ~17.0.10, npm install, expo-doctor.
+2. ✅ Plan approved for fixed movieVault theme.
+3. ✅ ThemeContext.tsx simplified (static movieVault).
+4. ✅ use-color-scheme.ts/web.ts always "dark".
+5. ✅ use-theme-color.ts movieVault only.
+6. ✅ constants/theme.ts movieVault colors.
+7. ✅ themed-text/view.tsx updated.
+8. ✅ Removed toggleTheme etc from app/index.tsx, app/(tabs)/index.tsx.
+9. ✅ Fixed TS errors in hooks/context.
+10. ✅ Layout StatusBar light.
 
-## Auth Context
-
-- [x] Create AuthContext for managing user session (context/AuthContext.tsx)
-
-## Pages
-
-- [x] Create Login page (app/login.tsx)
-- [x] Create Registration page (app/register.tsx)
-- [x] Create Account Setup page (app/setup-account.tsx)
-- [x] Update Homepage (app/(tabs)/index.tsx)
-
-## Layout Updates
-
-- [x] Update app/\_layout.tsx to include auth state and routing
+Run `npx expo start` to launch with fixed movieVault theme (no light/system switching).
