@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, {
   createContext,
   ReactNode,
@@ -7,9 +6,26 @@ import React, {
   useState,
 } from "react";
 
-interface User {
+import { authInstance } from "@/lib/firebase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+interface FirebaseUser {
+  uid: string;
   email: string;
-  password?: string;
+  displayName: string | null;
+  photoURL: string | null;
+}
+
+interface Profile {
+  firstName?: string;
+  lastName?: string;
+  profilePhoto?: string;
+  isSetupComplete: boolean;
+}
+
+interface User {
+  uid: string;
+  email: string;
   firstName?: string;
   lastName?: string;
   profilePhoto?: string;
@@ -31,51 +47,44 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const STORAGE_KEYS = {
-  USER: "@auth_user",
-  USERS: "@auth_users",
-};
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
+  const [localProfile, setLocalProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  const loadUser = async () => {
+  const loadProfile = async (uid: string) => {
     try {
-      const userData = await AsyncStorage.getItem(STORAGE_KEYS.USER);
-      if (userData) {
-        setUser(JSON.parse(userData));
+      const profileStr = await AsyncStorage.getItem(`@profile_${uid}`);
+      if (profileStr) {
+        const profile = JSON.parse(profileStr) as Profile;
+        setLocalProfile(profile);
       }
     } catch (error) {
-      console.error("Error loading user:", error);
-    } finally {
-      setIsLoading(false);
+      console.error("Error loading profile:", error);
     }
   };
 
+  useEffect(() => {
+    const unsub = authInstance.onAuthStateChanged(
+      async (fbUser: FirebaseUser | null) => {
+        setIsLoading(true);
+        if (fbUser) {
+          await loadProfile(fbUser.uid);
+          setFirebaseUser(fbUser);
+        } else {
+          setFirebaseUser(null);
+          setLocalProfile(null);
+        }
+        setIsLoading(false);
+      },
+    );
+    return () => unsub();
+  }, []);
+
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const usersData = await AsyncStorage.getItem(STORAGE_KEYS.USERS);
-      const users: User[] = usersData ? JSON.parse(usersData) : [];
-
-      const foundUser = users.find(
-        (u) => u.email.toLowerCase() === email.toLowerCase(),
-      );
-
-      if (foundUser) {
-        const { password: _, ...userWithoutPassword } = foundUser;
-        setUser(userWithoutPassword);
-        await AsyncStorage.setItem(
-          STORAGE_KEYS.USER,
-          JSON.stringify(userWithoutPassword),
-        );
-        return true;
-      }
-      return false;
+      await authInstance.signInWithEmailAndPassword(email, password);
+      return true;
     } catch (error) {
       console.error("Login error:", error);
       return false;
@@ -87,32 +96,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     password: string,
   ): Promise<boolean> => {
     try {
-      const usersData = await AsyncStorage.getItem(STORAGE_KEYS.USERS);
-      const users: User[] = usersData ? JSON.parse(usersData) : [];
-
-      const existingUser = users.find(
-        (u) => u.email.toLowerCase() === email.toLowerCase(),
-      );
-      if (existingUser) {
-        return false;
-      }
-
-      const newUser: User = {
+      const result = await authInstance.createUserWithEmailAndPassword(
         email,
         password,
-        isSetupComplete: false,
-      };
-
-      users.push(newUser);
-      await AsyncStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-
-      const { password: _, ...userWithoutPassword } = newUser;
-      setUser(userWithoutPassword);
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.USER,
-        JSON.stringify(userWithoutPassword),
       );
-
+      const uid = result.user.uid;
+      const initialProfile = {
+        isSetupComplete: false,
+        firstName: "",
+        lastName: "",
+        profilePhoto: undefined,
+      };
+      await AsyncStorage.setItem(
+        `@profile_${uid}`,
+        JSON.stringify(initialProfile),
+      );
       return true;
     } catch (error) {
       console.error("Register error:", error);
@@ -125,32 +123,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     lastName: string,
     profilePhoto?: string,
   ): Promise<void> => {
-    if (!user) return;
+    if (!firebaseUser) return;
 
     try {
-      const updatedUser: User = {
-        ...user,
+      const profile: Profile = {
         firstName,
         lastName,
         profilePhoto,
         isSetupComplete: true,
       };
-
-      setUser(updatedUser);
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.USER,
-        JSON.stringify(updatedUser),
-      );
-
-      const usersData = await AsyncStorage.getItem(STORAGE_KEYS.USERS);
-      if (usersData) {
-        const users: User[] = JSON.parse(usersData);
-        const userIndex = users.findIndex((u) => u.email === user.email);
-        if (userIndex !== -1) {
-          users[userIndex] = updatedUser;
-          await AsyncStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-        }
-      }
+      const uid = firebaseUser.uid;
+      setLocalProfile(profile);
+      await AsyncStorage.setItem(`@profile_${uid}`, JSON.stringify(profile));
+      await authInstance.currentUser?.updateProfile({
+        displayName: `${firstName} ${lastName}`,
+        photoURL: profilePhoto,
+      });
     } catch (error) {
       console.error("Setup account error:", error);
     }
@@ -158,12 +146,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      setUser(null);
-      await AsyncStorage.removeItem(STORAGE_KEYS.USER);
+      await authInstance.signOut();
     } catch (error) {
       console.error("Logout error:", error);
     }
   };
+
+  const user: User | null = firebaseUser
+    ? {
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        firstName: localProfile?.firstName,
+        lastName: localProfile?.lastName,
+        profilePhoto:
+          localProfile?.profilePhoto || firebaseUser.photoURL || undefined,
+        isSetupComplete: localProfile?.isSetupComplete ?? false,
+      }
+    : null;
 
   return (
     <AuthContext.Provider
