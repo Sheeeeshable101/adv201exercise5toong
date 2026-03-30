@@ -111,7 +111,7 @@ export default function RegisterScreen() {
                     color: useThemeColor({
                       light: "#000000",
                       dark: "#ffffff",
-                      movieVault: "#e0e0e0",
+                      movieVault: "#ffffff",
                     }),
                   },
                   (errors.email || registerError) && styles.inputError,

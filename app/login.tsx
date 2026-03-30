@@ -130,7 +130,7 @@ export default function LoginScreen() {
                     {
                       backgroundColor: useThemeColor({}, "inputBg"),
                       borderColor: useThemeColor({}, "inputBorder"),
-                      color: useThemeColor({}, "inputText"),
+                      color: "#ffffff",
                     },
                   ]}
                   placeholder="Enter your password"

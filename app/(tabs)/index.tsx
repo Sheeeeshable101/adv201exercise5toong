@@ -3,8 +3,10 @@ import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
+  Alert,
   Dimensions,
   FlatList,
   SafeAreaView,
@@ -17,17 +19,36 @@ import {
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-import {
-  featuredMovie,
-  popularMovies,
-  trendingMovies,
-} from "../../data/movies";
+import { featuredMovie, movies } from "../../data/movies";
 
 export default function HomeScreen() {
   const [, dispatch] = useTheme();
+  const router = useRouter();
   const { user } = useAuth();
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
+
+  const profileButtonBg = useThemeColor({
+    light: "rgba(0,0,0,0.1)",
+    dark: "rgba(255,255,255,0.2)",
+    movieVault: "rgba(255,255,255,0.15)",
+  });
+  const themeToggleBg = profileButtonBg;
+  const featuredOverlayBg = useThemeColor({
+    light: "rgba(0,0,0,0.5)",
+    dark: "rgba(0,0,0,0.8)",
+    movieVault: "rgba(0,0,0,0.7)",
+  });
+  const playButtonBg = useThemeColor({
+    light: "#E50914",
+    dark: "#ff453a",
+    movieVault: "#bb86fc",
+  });
+  const posterOverlayBg = useThemeColor({
+    light: "rgba(0,0,0,0.6)",
+    dark: "rgba(0,0,0,0.8)",
+    movieVault: "rgba(0,0,0,0.75)",
+  });
 
   const toggleTheme = () => dispatch({ type: "TOGGLE_THEME" });
   const playMovie = (title: string) => {
@@ -40,7 +61,9 @@ export default function HomeScreen() {
       onPress={() => playMovie(item.title)}
     >
       <Image source={item.image} style={styles.posterImage} />
-      <View style={styles.posterOverlay}>
+      <View
+        style={[styles.posterOverlay, { backgroundColor: posterOverlayBg }]}
+      >
         <ThemedText style={styles.posterTitle} numberOfLines={2}>
           {item.title}
         </ThemedText>
@@ -51,6 +74,10 @@ export default function HomeScreen() {
   const renderRowHeader = (title: string) => (
     <ThemedText style={styles.sectionHeader}>{title}</ThemedText>
   );
+
+  const profileName = user
+    ? (user.firstName || "") + " " + (user.lastName || "")
+    : "Guest";
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
@@ -70,14 +97,25 @@ export default function HomeScreen() {
           <TouchableOpacity style={styles.headerButton}>
             <ThemedText style={styles.headerButtonText}>Movies</ThemedText>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.profileButton} onPress={() => {}}>
-            <ThemedText style={styles.profileInitials}>
-              {user
-                ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
-                : "G"}
-            </ThemedText>
+          <TouchableOpacity
+            style={[styles.profileButton, { backgroundColor: profileButtonBg }]}
+            onPress={() => router.push("/account")}
+          >
+            {user?.profilePhoto ? (
+              <Image
+                source={{ uri: user.profilePhoto }}
+                style={styles.profileImage}
+              />
+            ) : (
+              <ThemedText style={styles.profileInitials}>
+                {profileName.slice(0, 2).toUpperCase()}
+              </ThemedText>
+            )}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.themeToggle} onPress={toggleTheme}>
+          <TouchableOpacity
+            style={[styles.themeToggle, { backgroundColor: themeToggleBg }]}
+            onPress={toggleTheme}
+          >
             <ThemedText style={styles.themeToggleText}>🎨</ThemedText>
           </TouchableOpacity>
         </View>
@@ -87,7 +125,12 @@ export default function HomeScreen() {
         {/* Featured Banner */}
         <View style={styles.featuredBanner}>
           <Image source={featuredMovie.image} style={styles.featuredImage} />
-          <View style={styles.featuredOverlay}>
+          <View
+            style={[
+              styles.featuredOverlay,
+              { backgroundColor: featuredOverlayBg },
+            ]}
+          >
             <ThemedText style={styles.featuredTitle}>
               {featuredMovie.title}
             </ThemedText>
@@ -95,7 +138,7 @@ export default function HomeScreen() {
               Watch the latest blockbuster hit. Action-packed adventure awaits!
             </ThemedText>
             <TouchableOpacity
-              style={styles.playButton}
+              style={[styles.playButton, { backgroundColor: playButtonBg }]}
               onPress={() => playMovie(featuredMovie.title)}
             >
               <ThemedText style={styles.playButtonText}>▶️ Play</ThemedText>
@@ -106,13 +149,13 @@ export default function HomeScreen() {
         <View style={styles.content}>
           {/* Continue Watching Row */}
           <View style={styles.row}>
-            {renderRowHeader("Continue Watching For John Doe")}
+            {renderRowHeader(`Continue Watching for ${profileName}`)}
             <FlatList
-              data={trendingMovies.slice(0, 5)}
+              data={movies.slice(0, 5)}
               horizontal
               showsHorizontalScrollIndicator={false}
               renderItem={renderMoviePoster}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item) => item.id}
               contentContainerStyle={styles.rowContent}
             />
           </View>
@@ -121,11 +164,11 @@ export default function HomeScreen() {
           <View style={styles.row}>
             {renderRowHeader("Trending Now")}
             <FlatList
-              data={popularMovies.slice(0, 8)}
+              data={movies.slice(0, 8)}
               horizontal
               showsHorizontalScrollIndicator={false}
               renderItem={renderMoviePoster}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item) => item.id}
               contentContainerStyle={styles.rowContent}
             />
           </View>
@@ -134,11 +177,11 @@ export default function HomeScreen() {
           <View style={styles.row}>
             {renderRowHeader("Top Picks For You")}
             <FlatList
-              data={trendingMovies.slice(0, 6)}
+              data={movies.slice(0, 6)}
               horizontal
               showsHorizontalScrollIndicator={false}
               renderItem={renderMoviePoster}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item) => item.id}
               contentContainerStyle={styles.rowContent}
             />
           </View>
@@ -184,9 +227,13 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "rgba(255,255,255,0.2)",
     justifyContent: "center",
     alignItems: "center",
+  },
+  profileImage: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
   },
   profileInitials: {
     fontSize: 14,
@@ -196,7 +243,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "rgba(255,255,255,0.2)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -219,7 +265,6 @@ const styles = StyleSheet.create({
   },
   featuredOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.6)",
     justifyContent: "flex-end",
     padding: 20,
   },
@@ -234,7 +279,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   playButton: {
-    backgroundColor: "#E50914",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 4,
@@ -242,7 +286,6 @@ const styles = StyleSheet.create({
     width: 120,
   },
   playButtonText: {
-    color: "white",
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
@@ -263,8 +306,8 @@ const styles = StyleSheet.create({
     paddingRight: 16,
   },
   posterCard: {
-    width: 120,
-    height: 180,
+    width: 160,
+    height: 240,
     position: "relative",
     borderRadius: 8,
     overflow: "hidden",
@@ -275,13 +318,11 @@ const styles = StyleSheet.create({
   },
   posterOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.7)",
     padding: 8,
     justifyContent: "flex-end",
   },
   posterTitle: {
     fontSize: 12,
     fontWeight: "600",
-    color: "white",
   },
 });

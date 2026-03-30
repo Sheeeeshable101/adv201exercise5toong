@@ -53,7 +53,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     theme: "movieVault" as Theme,
   });
 
-  // Persist theme
   useEffect(() => {
     AsyncStorage.getItem("@theme").then((savedTheme) => {
       if (

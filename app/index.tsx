@@ -2,12 +2,14 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
+import { useThemeColor } from "@/hooks/use-theme-color";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Animated,
   Dimensions,
   Easing,
+  Image,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -20,7 +22,38 @@ export default function LandingScreen() {
   const theme = state.theme;
   const router = useRouter();
   const { user, isLoading } = useAuth();
+
+  const getUserInitials = () => {
+    if (user?.firstName && user.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    }
+    return user ? user.email[0].toUpperCase() : "";
+  };
   const [loadingAnim] = useState(new Animated.Value(0));
+
+  const signInColor = useThemeColor({
+    light: "#E50914",
+    dark: "#ff453a",
+    movieVault: "#bb86fc",
+  });
+  const signUpBgColor = useThemeColor({
+    light: "rgba(0,0,0,0.05)",
+    dark: "rgba(255,255,255,0.1)",
+    movieVault: "rgba(255,255,255,0.15)",
+  });
+  const themeToggleBgColor = useThemeColor({
+    light: "rgba(0,0,0,0.1)",
+    dark: "rgba(255,255,255,0.2)",
+    movieVault: "rgba(255,255,255,0.15)",
+  });
+  const spinnerBorderColor = useThemeColor({
+    light: "rgba(0,0,0,0.3)",
+    dark: "rgba(255,255,255,0.3)",
+    movieVault: "rgba(255,255,255,0.3)",
+  });
+  const spinnerBorderTopColor = signInColor;
+  const spinnerInnerBorderColor = spinnerBorderColor;
+  const spinnerInnerBorderTopColor = signInColor;
 
   const toggleTheme = () => dispatch({ type: "TOGGLE_THEME" });
 
@@ -71,9 +104,24 @@ export default function LandingScreen() {
           <ThemedText style={styles.loadingLogoAccent}>Vault</ThemedText>
         </View>
         <Animated.View
-          style={[styles.loadingSpinner, { transform: [{ rotate: spin }] }]}
+          style={[
+            styles.loadingSpinner,
+            {
+              borderColor: spinnerBorderColor,
+              borderTopColor: spinnerBorderTopColor,
+              transform: [{ rotate: spin }],
+            },
+          ]}
         >
-          <View style={styles.spinnerInner} />
+          <View
+            style={[
+              styles.spinnerInner,
+              {
+                borderColor: spinnerInnerBorderColor,
+                borderTopColor: spinnerInnerBorderTopColor,
+              },
+            ]}
+          />
         </Animated.View>
         <ThemedText style={styles.loadingText}>
           Loading your experience...
@@ -84,9 +132,31 @@ export default function LandingScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <TouchableOpacity style={styles.themeToggle} onPress={toggleTheme}>
+      <TouchableOpacity
+        style={[styles.themeToggle, { backgroundColor: themeToggleBgColor }]}
+        onPress={toggleTheme}
+      >
         <ThemedText style={styles.themeToggleText}>{themeText}</ThemedText>
       </TouchableOpacity>
+      {user && (
+        <TouchableOpacity
+          style={styles.profileButton}
+          onPress={() => router.push("/account")}
+        >
+          {user.profilePhoto ? (
+            <Image
+              source={{ uri: user.profilePhoto }}
+              style={styles.profileImage}
+            />
+          ) : (
+            <View style={styles.profileInitials}>
+              <ThemedText style={styles.profileInitialsText}>
+                {getUserInitials()}
+              </ThemedText>
+            </View>
+          )}
+        </TouchableOpacity>
+      )}
       <ThemedView style={styles.backgroundGradient}>
         <View style={styles.logoSection}>
           <ThemedText style={styles.logoText}>Movie</ThemedText>
@@ -104,14 +174,14 @@ export default function LandingScreen() {
 
       <View style={styles.buttonSection}>
         <TouchableOpacity
-          style={styles.signInButton}
+          style={[styles.signInButton, { backgroundColor: signInColor }]}
           onPress={() => router.push("/login")}
         >
           <ThemedText style={styles.signInButtonText}>Sign In</ThemedText>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.signUpButton}
+          style={[styles.signUpButton, { backgroundColor: signUpBgColor }]}
           onPress={() => router.push("/register")}
         >
           <ThemedText style={styles.signUpButtonText}>
@@ -150,6 +220,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  profileButton: {
+    position: "absolute",
+    top: 60,
+    left: 20,
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  profileInitials: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#3700B3",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  profileInitialsText: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
   themeToggle: {
     position: "absolute",
     top: 60,
@@ -158,7 +251,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
     zIndex: 1,
-    backgroundColor: "rgba(255,255,255,0.2)",
   },
   themeToggleText: {
     textAlign: "center",
@@ -203,7 +295,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   signInButton: {
-    backgroundColor: "#E50914",
     paddingVertical: 16,
     borderRadius: 4,
     alignItems: "center",
@@ -214,7 +305,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   signUpButton: {
-    backgroundColor: "rgba(255,255,255,0.1)",
     paddingVertical: 16,
     borderRadius: 4,
     alignItems: "center",
@@ -244,6 +334,7 @@ const styles = StyleSheet.create({
   featureText: {
     fontSize: 10,
     textAlign: "center",
+    fontWeight: "600",
   },
   loadingContainer: {
     flex: 1,
@@ -275,8 +366,6 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     borderWidth: 4,
-    borderColor: "rgba(255,255,255,0.3)",
-    borderTopColor: "#E50914",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
@@ -286,7 +375,5 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
     borderWidth: 3,
-    borderColor: "rgba(255,255,255,0.2)",
-    borderTopColor: "#E50914",
   },
 });

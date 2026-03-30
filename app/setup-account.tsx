@@ -117,9 +117,7 @@ export default function SetupAccountScreen() {
             ]}
             placeholder="Enter your first name"
             placeholderTextColor={useThemeColor({}, "placeholder")}
-            {...register("firstName", {
-              required: "First name is required",
-            })}
+            {...register("firstName")}
           />
           {errors.firstName ? (
             <ThemedText style={styles.errorText}>
@@ -142,9 +140,7 @@ export default function SetupAccountScreen() {
             ]}
             placeholder="Enter your last name"
             placeholderTextColor={useThemeColor({}, "placeholder")}
-            {...register("lastName", {
-              required: "Last name is required",
-            })}
+            {...register("lastName")}
           />
           {errors.lastName ? (
             <ThemedText style={styles.errorText}>

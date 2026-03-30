@@ -30,8 +30,8 @@ export default function AccountScreen() {
   const theme = useHookColorScheme();
   const backgroundColor = useThemeColor({}, "background");
   const textColor = useThemeColor({}, "text");
-  const iconColor = useThemeColor({}, "icon");
-  const tintColor = useThemeColor({}, "tint");
+  const iconColor = useThemeColor({}, "placeholder");
+  const tintColor = useThemeColor({}, "primary");
   const inputBgColor = useThemeColor(
     { light: "#f8f9fa", dark: "#333333" },
     "card",
@@ -155,7 +155,7 @@ export default function AccountScreen() {
                   color: textColor,
                 },
               ]}
-              placeholder="Enter your first name"
+              placeholder="First name (optional)"
               placeholderTextColor={iconColor}
               value={firstName}
               onChangeText={setFirstName}
@@ -173,7 +173,7 @@ export default function AccountScreen() {
                   color: textColor,
                 },
               ]}
-              placeholder="Enter your last name"
+              placeholder="Last name (optional)"
               placeholderTextColor={iconColor}
               value={lastName}
               onChangeText={setLastName}
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 3,
-    borderColor: "#E50914", // Keep accent as tint
+    borderColor: "#E50914",
   },
   photoPlaceholder: {
     width: 120,
