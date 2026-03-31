@@ -1,7 +1,7 @@
 import { getApps, initializeApp } from "@react-native-firebase/app";
 import auth from "@react-native-firebase/auth";
 
-const firebaseConfig = {
+let firebaseConfig = {
   apiKey: "AIzaSyBj5us8nijxqTJ4dYqYFz9nWFhjYciC_II",
   authDomain: "adv102exercise7.firebaseapp.com",
   projectId: "adv102exercise7",
@@ -19,4 +19,5 @@ if (getApps().length === 0) {
 }
 
 export const authInstance = auth();
+export { firebaseConfig };
 export default firebaseApp;

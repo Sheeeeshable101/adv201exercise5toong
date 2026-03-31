@@ -27,7 +27,7 @@ export default function LandingScreen() {
     if (user?.firstName && user.lastName) {
       return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
     }
-    return user ? user.email[0].toUpperCase() : "";
+    return user ? (user.email || "")[0].toUpperCase() : "";
   };
   const [loadingAnim] = useState(new Animated.Value(0));
 

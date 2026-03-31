@@ -1,14 +1,12 @@
-# Firebase Auth Integration TODO
+# Firebase Native Module Fix - TODO
 
-## Steps:
+## Steps to Complete:
 
-- [x] 1. Create Git branch `blackboxai/firebase-auth`
-- [x] 2. Create `lib/firebase.ts` with Firebase config and Auth exports
-- [ ] 3. Update package.json and install @react-native-firebase/app @react-native-firebase/auth
-- [x] 4. Refactor `context/AuthContext.tsx` to use Firebase Auth instead of AsyncStorage
-- [ ] 5. Test auth flows (register -> setup -> tabs; login; logout)
-- [ ] 6. Update screens if needed (setup-account, account for profile photo)
-- [ ] 7. Commit changes
-- [ ] 8. Create PR
+- [x] 1. Add '@react-native-firebase/app' plugin to app.json
+- [x] 1. Add '@react-native-firebase/app' plugin to app.json&#10;- [x] 2. Run `npx expo prebuild --clean` to generate native projects with linking
+- [ ] 3. For iOS: Install CocoaPods (`sudo gem install cocoapods` if needed), then `cd ios && npx pod-install`
+- [ ] 4. Run development build: `npx expo run:android` (or `npx expo run:ios`)
+- [ ] 5. Clear cache: `npx expo start --clear` and test login/register screens
+- [ ] 6. Verify no more 'rnfbappmodule not found' error
 
-Current: lib/firebase.ts fixed (step 3 complete). Next: Step 4 - Refactor AuthContext
+**Next command to run:** `npx expo prebuild --clean`

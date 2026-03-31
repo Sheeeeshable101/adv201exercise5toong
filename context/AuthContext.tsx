@@ -6,12 +6,12 @@ import React, {
   useState,
 } from "react";
 
-import { authInstance } from "@/lib/firebase";
+import { authInstance, firebaseConfig } from "@/lib/firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface FirebaseUser {
   uid: string;
-  email: string;
+  email: string | null;
   displayName: string | null;
   photoURL: string | null;
 }
@@ -25,7 +25,7 @@ interface Profile {
 
 interface User {
   uid: string;
-  email: string;
+  email: string | null;
   firstName?: string;
   lastName?: string;
   profilePhoto?: string;
@@ -43,6 +43,7 @@ interface AuthContextType {
     profilePhoto?: string,
   ) => Promise<void>;
   logout: () => Promise<void>;
+  googleSignIn: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -65,19 +66,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const unsub = authInstance.onAuthStateChanged(
-      async (fbUser: FirebaseUser | null) => {
-        setIsLoading(true);
-        if (fbUser) {
-          await loadProfile(fbUser.uid);
-          setFirebaseUser(fbUser);
-        } else {
-          setFirebaseUser(null);
-          setLocalProfile(null);
-        }
-        setIsLoading(false);
-      },
-    );
+    const unsub = authInstance.onAuthStateChanged(async (fbUser) => {
+      setIsLoading(true);
+      if (fbUser) {
+        await loadProfile(fbUser.uid);
+        setFirebaseUser(fbUser);
+      } else {
+        setFirebaseUser(null);
+        setLocalProfile(null);
+      }
+      setIsLoading(false);
+    });
     return () => unsub();
   }, []);
 
@@ -152,6 +151,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const googleSignIn = async (): Promise<boolean> => {
+    if (typeof window === "undefined") {
+      console.log("Google sign in only on web");
+      return false;
+    }
+    const { getAuth, GoogleAuthProvider, signInWithPopup } =
+      await import("firebase/auth");
+    const { initializeApp } = await import("firebase/app");
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const uid = result.user.uid;
+      await loadProfile(uid);
+      const fbUser: FirebaseUser = {
+        uid,
+        email: result.user.email!,
+        displayName: result.user.displayName,
+        photoURL: result.user.photoURL,
+      };
+      setFirebaseUser(fbUser);
+      return true;
+    } catch (error) {
+      console.error("Google sign in error:", error);
+      return false;
+    }
+  };
+
   const user: User | null = firebaseUser
     ? {
         uid: firebaseUser.uid,
@@ -166,7 +194,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, isLoading, login, register, setupAccount, logout }}
+      value={{
+        user,
+        isLoading,
+        login,
+        register,
+        setupAccount,
+        logout,
+        googleSignIn,
+      }}
     >
       {children}
     </AuthContext.Provider>
