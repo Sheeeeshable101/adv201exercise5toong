@@ -24,9 +24,10 @@ interface LoginFormData {
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, googleSignIn } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const {
     handleSubmit,
@@ -85,6 +86,35 @@ export default function LoginScreen() {
               Sign in to continue watching
             </ThemedText>
           </View>
+
+          <TouchableOpacity
+            style={[
+              styles.googleButton,
+              {
+                backgroundColor: useThemeColor({}, "card"),
+                borderColor: useThemeColor({}, "border"),
+              },
+            ]}
+            onPress={async () => {
+              setGoogleLoading(true);
+              const success = await googleSignIn();
+              setGoogleLoading(false);
+              if (success) {
+                router.replace("/(tabs)");
+              } else {
+                setLoginError("Google sign-in failed. Please try again.");
+              }
+            }}
+            disabled={googleLoading}
+          >
+            {googleLoading ? (
+              <ActivityIndicator color={useThemeColor({}, "text")} />
+            ) : (
+              <ThemedText style={styles.googleButtonText}>
+                👤 Continue with Google
+              </ThemedText>
+            )}
+          </TouchableOpacity>
 
           <View style={styles.form}>
             <View style={styles.inputContainer}>
@@ -187,21 +217,6 @@ export default function LoginScreen() {
               )}
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.googleButton}
-              onPress={async () => {
-                const { googleSignIn } = useAuth();
-                const success = await googleSignIn();
-                if (success) {
-                  router.replace("/(tabs)");
-                }
-              }}
-            >
-              <ThemedText style={styles.googleButtonText}>
-                Continue with Google
-              </ThemedText>
-            </TouchableOpacity>
-
             <View style={styles.footer}>
               <ThemedText style={styles.footerText}>
                 Don't have an account?{" "}
@@ -227,6 +242,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  googleButton: {
+    height: 50,
+    borderRadius: 4,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+    borderWidth: 1,
+  },
+  googleButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
   scrollContent: {
     flexGrow: 1,
     justifyContent: "center",
@@ -300,20 +328,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
-  googleButton: {
-    height: 50,
-    borderRadius: 4,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 12,
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  googleButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#4285f4",
-  },
+
   buttonText: {
     fontSize: 16,
     fontWeight: "bold",

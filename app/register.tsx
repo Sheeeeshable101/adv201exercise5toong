@@ -291,21 +291,6 @@ export default function RegisterScreen() {
               )}
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.googleButton}
-              onPress={async () => {
-                const { googleSignIn } = useAuth();
-                const success = await googleSignIn();
-                if (success) {
-                  router.replace("/setup-account");
-                }
-              }}
-            >
-              <ThemedText style={styles.googleButtonText}>
-                Continue with Google
-              </ThemedText>
-            </TouchableOpacity>
-
             <View style={styles.footer}>
               <ThemedText style={styles.footerText}>
                 Already have an account?{" "}
@@ -409,20 +394,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
-  googleButton: {
-    height: 50,
-    borderRadius: 4,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 12,
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  googleButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#4285f4",
-  },
+
   buttonText: {
     fontSize: 16,
     fontWeight: "bold",

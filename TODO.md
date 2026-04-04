@@ -1,12 +1,9 @@
-# Firebase Native Module Fix - TODO
+# Firebase Android Setup TODO
 
-## Steps to Complete:
+## Steps:
 
-- [x] 1. Add '@react-native-firebase/app' plugin to app.json
-- [x] 1. Add '@react-native-firebase/app' plugin to app.json&#10;- [x] 2. Run `npx expo prebuild --clean` to generate native projects with linking
-- [ ] 3. For iOS: Install CocoaPods (`sudo gem install cocoapods` if needed), then `cd ios && npx pod-install`
-- [ ] 4. Run development build: `npx expo run:android` (or `npx expo run:ios`)
-- [ ] 5. Clear cache: `npx expo start --clear` and test login/register screens
-- [ ] 6. Verify no more 'rnfbappmodule not found' error
-
-**Next command to run:** `npx expo prebuild --clean`
+1. [x] Create TODO.md with plan steps
+2. [x] Update lib/firebase.ts for platform-specific Firebase initialization (native uses google-services.json, web uses config).
+3. [ ] Run `npx expo prebuild --clean --platform android` to embed google-services.json.
+4. [ ] Add SHA1 fingerprint `5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25` to Firebase console Android app.
+5. [ ] Test with `npx expo run:android`.

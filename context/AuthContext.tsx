@@ -6,8 +6,10 @@ import React, {
   useState,
 } from "react";
 
-import { authInstance, firebaseConfig } from "@/lib/firebase";
+import { authInstance } from "@/lib/firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { GoogleAuthProvider } from "@react-native-firebase/auth";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 interface FirebaseUser {
   uid: string;
@@ -143,40 +145,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = async () => {
+  const googleSignIn = async (): Promise<boolean> => {
     try {
-      await authInstance.signOut();
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      // @ts-ignore Property 'idToken' on SignInResponse (library types issue)
+      const idToken = (userInfo as any).idToken;
+      if (!idToken) throw new Error("No ID token found");
+      const googleCredential = GoogleAuthProvider.credential(idToken);
+
+      await authInstance.signInWithCredential(googleCredential);
+      return true;
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error("Google Sign-In error:", error);
+      return false;
     }
   };
 
-  const googleSignIn = async (): Promise<boolean> => {
-    if (typeof window === "undefined") {
-      console.log("Google sign in only on web");
-      return false;
-    }
-    const { getAuth, GoogleAuthProvider, signInWithPopup } =
-      await import("firebase/auth");
-    const { initializeApp } = await import("firebase/app");
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
+  const logout = async () => {
     try {
-      const result = await signInWithPopup(auth, provider);
-      const uid = result.user.uid;
-      await loadProfile(uid);
-      const fbUser: FirebaseUser = {
-        uid,
-        email: result.user.email!,
-        displayName: result.user.displayName,
-        photoURL: result.user.photoURL,
-      };
-      setFirebaseUser(fbUser);
-      return true;
+      await authInstance.signOut();
+      await GoogleSignin.signOut(); // Also sign out from Google
     } catch (error) {
-      console.error("Google sign in error:", error);
-      return false;
+      console.error("Logout error:", error);
     }
   };
 

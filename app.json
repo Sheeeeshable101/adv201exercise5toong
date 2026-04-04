@@ -18,7 +18,8 @@
         "monochromeImage": "./assets/images/movie vault.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.movievault"
+      "package": "com.Toong.movievaultadv102exercise",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "static",
@@ -38,11 +39,9 @@
           }
         }
       ],
-      "@react-native-firebase/app",
-      "@react-native-firebase/auth",
-      "@react-native-google-signin/google-signin",
       "expo-web-browser"
     ],
+
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
