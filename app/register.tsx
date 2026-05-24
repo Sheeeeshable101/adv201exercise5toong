@@ -1,3 +1,4 @@
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { useAuth } from "@/context/AuthContext";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
@@ -87,6 +88,14 @@ export default function RegisterScreen() {
         </View>
 
         <View style={styles.form}>
+          <GoogleSignInButton />
+
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>or</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Email</Text>
             <TextInput
@@ -257,6 +266,22 @@ const styles = StyleSheet.create({
   },
   form: {
     width: "100%",
+  },
+  divider: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#444",
+  },
+  dividerText: {
+    color: "#666",
+    fontSize: 14,
+    marginHorizontal: 16,
+    textTransform: "lowercase",
   },
   inputContainer: {
     marginBottom: 20,

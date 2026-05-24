@@ -31,6 +31,7 @@ export default function SetupAccountScreen() {
     handleSubmit,
     formState: { errors },
     register,
+    setValue,
   } = useForm<SetupFormData>({
     defaultValues: { firstName: "", lastName: "" },
     mode: "onBlur",
@@ -105,6 +106,7 @@ export default function SetupAccountScreen() {
             style={[styles.input, errors.firstName && styles.inputError]}
             placeholder="Enter your first name"
             placeholderTextColor="#666"
+            onChangeText={(text) => setValue("firstName", text)}
             {...register("firstName", {
               required: "First name is required",
             })}
@@ -120,6 +122,7 @@ export default function SetupAccountScreen() {
             style={[styles.input, errors.lastName && styles.inputError]}
             placeholder="Enter your last name"
             placeholderTextColor="#666"
+            onChangeText={(text) => setValue("lastName", text)}
             {...register("lastName", {
               required: "Last name is required",
             })}
